@@ -10,9 +10,13 @@ function Cart({ onClose }) {
   const totalAmount = `$${cartCtx.totalAmount.toFixed(2)}`;
   const hasItems = cartCtx.items.length > 0;
 
-  const cartItemAddHandler = (item) => {};
+  const cartItemAddHandler = (item) => {
+    cartCtx.addItem({ ...item, amount: 1 });
+  };
 
-  const cartItemRemoveHandler = (id) => {};
+  const cartItemRemoveHandler = (id) => {
+    cartCtx.removeItem(id);
+  };
 
   const cartItems = (
     <ul className={styles["cart-items"]}>
@@ -33,8 +37,8 @@ function Cart({ onClose }) {
     <Modal onClick={onClose}>
       {cartItems}
       <div className={styles.total}>
+        <span>Total Amount</span>
         <span>{totalAmount}</span>
-        <span>ActualAmount</span>
       </div>
       <div className={styles.actions}>
         <button className={styles["button-alt"]} onClick={onClose}>
