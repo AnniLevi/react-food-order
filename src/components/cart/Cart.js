@@ -4,15 +4,19 @@ import Modal from "../ui/Modal";
 import CartItem from "./CartItem";
 import CheckoutForm from "./CheckoutForm";
 import styles from "./Cart.module.css";
-
-const apiUrl = process.env.REACT_APP_API_URL;
+import useHttp from "../../hooks/use-http";
 
 function Cart({ onClose }) {
   const [isCheckout, setIsCheckout] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [didSubmit, setDidSubmit] = useState(false);
 
   const cartCtx = useContext(CartContext);
+
+  const {
+    isLoading: isSubmitting,
+    error: httpError,
+    sendRequest: confirmOrder,
+  } = useHttp();
 
   const totalAmount = `$${cartCtx.totalAmount.toFixed(2)}`;
   const hasItems = cartCtx.items.length > 0;
@@ -30,20 +34,32 @@ function Cart({ onClose }) {
   };
 
   const submitOrderHandler = async (userData) => {
-    setIsSubmitting(true);
-
-    await fetch(`${apiUrl}/orders.json`, {
+    const requestConfig = {
+      url: "orders.json",
       method: "POST",
-      body: JSON.stringify({
+      body: {
         userData,
         orderedItems: cartCtx.items,
-      }),
-    });
-    setIsSubmitting(false);
+      },
+    };
+    confirmOrder(requestConfig);
     setDidSubmit(true);
 
     cartCtx.clearCart();
   };
+
+  if (httpError) {
+    return (
+      <Modal onClick={onClose}>
+        <p className={styles.OrderError}>{httpError}</p>
+        <div className={styles.actions}>
+          <button className={styles["button"]} onClick={onClose}>
+            Close
+          </button>
+        </div>
+      </Modal>
+    );
+  }
 
   const modalActions = (
     <div className={styles.actions}>
@@ -92,7 +108,7 @@ function Cart({ onClose }) {
       <p>Successfully sent the order!</p>
       <div className={styles.actions}>
         <button className={styles["button"]} onClick={onClose}>
-          Ok
+          Close
         </button>
       </div>
     </Fragment>

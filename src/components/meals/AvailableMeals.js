@@ -2,39 +2,31 @@ import styles from "./AvailableMeals.module.css";
 import Card from "../ui/Card";
 import MealItem from "./meal-item/MealItem";
 import { useEffect, useState } from "react";
-
-const apiUrl = process.env.REACT_APP_API_URL;
+import useHttp from "../../hooks/use-http";
 
 function AvailableMeals() {
   const [meals, setMeals] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [httpError, setHttpError] = useState(null);
+
+  const transformMeals = (meals) => {
+    const loadedMeals = [];
+    for (const key in meals) {
+      loadedMeals.push({
+        id: key,
+        name: meals[key].name,
+        description: meals[key].description,
+        price: meals[key].price,
+      });
+    }
+    setMeals(loadedMeals);
+  };
+
+  const requestConfig = { url: "meals.json" };
+
+  const { isLoading, error: httpError, sendRequest: fetchMeals } = useHttp();
 
   useEffect(() => {
-    const fetchMeals = async () => {
-      const response = await fetch(`${apiUrl}/meals.json`);
-
-      const responseData = await response.json(); // an object
-
-      const loadedMeals = [];
-      for (const key in responseData) {
-        loadedMeals.push({
-          id: key,
-          name: responseData[key].name,
-          description: responseData[key].description,
-          price: responseData[key].price,
-        });
-      }
-
-      setMeals(loadedMeals);
-      setIsLoading(false);
-    };
-
-    fetchMeals().catch((error) => {
-      setIsLoading(false);
-      setHttpError(error.message);
-    });
-  }, []);
+    fetchMeals(requestConfig, transformMeals);
+  }, [fetchMeals]);
 
   if (isLoading) {
     return (
