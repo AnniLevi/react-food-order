@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { Fragment, useContext, useState } from "react";
 import CartContext from "../../context/cart-context";
 import Modal from "../ui/Modal";
 import CartItem from "./CartItem";
@@ -9,6 +9,8 @@ const apiUrl = process.env.REACT_APP_API_URL;
 
 function Cart({ onClose }) {
   const [isCheckout, setIsCheckout] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [didSubmit, setDidSubmit] = useState(false);
 
   const cartCtx = useContext(CartContext);
 
@@ -28,7 +30,19 @@ function Cart({ onClose }) {
   };
 
   const submitOrderHandler = async (userData) => {
-    //TODO
+    setIsSubmitting(true);
+
+    await fetch(`${apiUrl}/orders.json`, {
+      method: "POST",
+      body: JSON.stringify({
+        userData,
+        orderedItems: cartCtx.items,
+      }),
+    });
+    setIsSubmitting(false);
+    setDidSubmit(true);
+
+    cartCtx.clearCart();
   };
 
   const modalActions = (
@@ -59,8 +73,8 @@ function Cart({ onClose }) {
     </ul>
   );
 
-  return (
-    <Modal onClick={onClose}>
+  const cartModalContent = (
+    <Fragment>
       {cartItems}
       <div className={styles.total}>
         <span>Total Amount</span>
@@ -70,6 +84,25 @@ function Cart({ onClose }) {
         <CheckoutForm onConfirm={submitOrderHandler} onCancel={onClose} />
       )}
       {!isCheckout && modalActions}
+    </Fragment>
+  );
+
+  const didSubmitModalContent = (
+    <Fragment>
+      <p>Successfully sent the order!</p>
+      <div className={styles.actions}>
+        <button className={styles["button"]} onClick={onClose}>
+          Ok
+        </button>
+      </div>
+    </Fragment>
+  );
+
+  return (
+    <Modal onClick={onClose}>
+      {!isSubmitting && !didSubmit && cartModalContent}
+      {isSubmitting && <p>Sending order data...</p>}
+      {!isSubmitting && didSubmit && didSubmitModalContent}
     </Modal>
   );
 }
