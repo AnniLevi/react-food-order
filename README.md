@@ -5,3 +5,4 @@
 - view the cart with total amount
 - change cart from a cart page
 - place an order from the cart page
+- backend API: https://firebase.google.com/ (Realtime Database)
