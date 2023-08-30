@@ -20,7 +20,7 @@ function AvailableMeals() {
     setMeals(loadedMeals);
   };
 
-  const requestConfig = { url: "meals.json" };
+  const requestConfig = { path: "meals.json" };
 
   const { isLoading, error: httpError, sendRequest: fetchMeals } = useHttp();
 

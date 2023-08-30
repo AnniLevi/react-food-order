@@ -35,7 +35,7 @@ function Cart({ onClose }) {
 
   const submitOrderHandler = async (userData) => {
     const requestConfig = {
-      url: "orders.json",
+      path: "orders.json",
       method: "POST",
       body: {
         userData,

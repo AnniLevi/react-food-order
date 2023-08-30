@@ -11,7 +11,7 @@ function useHttp() {
     setError(null);
 
     try {
-      const response = await fetch(`${apiUrl}/${requestConfig.url}`, {
+      const response = await fetch(`${apiUrl}/${requestConfig.path}`, {
         method: requestConfig.method ? requestConfig.method : "GET",
         headers: requestConfig.headers ? requestConfig.headers : {},
         body: requestConfig.body ? JSON.stringify(requestConfig.body) : null,
